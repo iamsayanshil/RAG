@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Imbue:opsz,wght@10..100,100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>S.W.A.N</title>
+  </head>
+
+  <body>
+    <header>
+      <h1 class="title">S.W.A.N</h1>
+      <p class="subtitle">Spoken Word Analysis Network</p>
+    </header>
+
+    <div class="main-container">
+      <div class="mic-container" id="record-btn">
+        <svg
+          class="mic-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path
+            d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"
+          />
+          <path
+            d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"
+          />
+        </svg>
+
+        <svg
+          class="mic-icon active-mic"
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <rect class="bar bar-1" x="4" y="4" width="4" height="16" rx="1" />
+          <rect class="bar bar-2" x="10" y="4" width="4" height="16" rx="1" />
+          <rect class="bar bar-3" x="16" y="4" width="4" height="16" rx="1" />
+        </svg>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
