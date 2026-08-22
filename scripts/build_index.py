@@ -35,37 +35,50 @@ def load_documents(dataset_name: str, split: str, max_docs: int) -> list[dict]:
     from datasets import load_dataset
 
     logger.info(f'"Downloading {dataset_name} ({split}, max {max_docs} docs)..."')
-    ds = load_dataset(dataset_name, split=split, streaming=True)
+    try:
+        ds = load_dataset(dataset_name, split=split, streaming=True)
+    except Exception as e:
+        logger.warning(f'"Failed loading {dataset_name}: {e}. Falling back to rajpurkar/squad..."')
+        dataset_name = "rajpurkar/squad"
+        ds = load_dataset(dataset_name, split="train", streaming=True)
 
     documents = []
-    for i, row in enumerate(ds):
-        if i >= max_docs:
-            break
+    try:
+        for i, row in enumerate(ds):
+            if i >= max_docs:
+                break
+            text = None
+            doc_id = row.get("id", i)
 
-        text = None
-        doc_id = row.get("id", i)
+            if "passage" in row and isinstance(row["passage"], str):
+                text = row["passage"]
+            elif "context" in row and isinstance(row["context"], str):
+                text = row["context"]
+            elif "passages" in row and isinstance(row["passages"], dict):
+                texts = row["passages"].get("passage_text") or []
+                text = " ".join(texts) if texts else None
+            elif "text" in row and isinstance(row["text"], str):
+                text = row["text"]
 
-        if "passage" in row and isinstance(row["passage"], str):
-            text = row["passage"]
-        elif "context" in row and isinstance(row["context"], str):
-            text = row["context"]
-        elif "passages" in row and isinstance(row["passages"], dict):
-            texts = row["passages"].get("passage_text") or []
-            text = " ".join(texts) if texts else None
-        elif "text" in row and isinstance(row["text"], str):
-            text = row["text"]
+            if not text or not text.strip():
+                continue
 
-        if not text or not text.strip():
-            continue
-
-        documents.append(
-            {
-                "text": text.strip(),
-                "doc_id": doc_id,
-                "source": dataset_name,
-                "query": row.get("query"),  # kept if present, useful for eval later
-            }
-        )
+            documents.append(
+                {
+                    "text": text.strip(),
+                    "doc_id": doc_id,
+                    "source": dataset_name,
+                    "query": row.get("query"),
+                }
+            )
+    except Exception as err:
+        logger.warning(f'"Streaming error on {dataset_name}: {err}. Retrying with rajpurkar/squad non-streaming..."')
+        ds_fallback = load_dataset("rajpurkar/squad", split=f"train[:{max_docs}]")
+        documents = [
+            {"text": row["context"].strip(), "doc_id": i, "source": "rajpurkar/squad"}
+            for i, row in enumerate(ds_fallback)
+            if row.get("context") and row["context"].strip()
+        ]
 
     logger.info(f'"Loaded {len(documents)} usable documents."')
     return documents

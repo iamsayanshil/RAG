@@ -56,6 +56,9 @@ async def lifespan(app: FastAPI):
             centroid = np.mean(sample_embeddings, axis=0)
             get_safety_guardrail(settings).set_domain_centroid(centroid)
 
+    from app.retrieval.reranker import get_reranker
+    get_reranker(settings)._load()
+
     app.state.retriever = retriever
     app.state.generator = AnswerGenerator(settings)
 
