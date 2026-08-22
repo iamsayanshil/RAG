@@ -1,2 +1,5 @@
+venv/
+voice_rag_db/
 .env
-.gitignore
+__pycache__/
+*.mp3
