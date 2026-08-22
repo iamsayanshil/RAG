@@ -21,7 +21,11 @@ logged request_id for debugging.
 
 from __future__ import annotations
 
+import json
+import time
 import uuid
+from datetime import datetime
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 
@@ -46,6 +50,22 @@ from app.utils.logger import LatencyTracker
 from app.utils.stt_client import TranscriptionError, transcribe_audio
 
 router = APIRouter(prefix="/api/v1", tags=["swan"])
+
+RECORD_FILE = Path("data/speech_records.jsonl")
+AUDIO_DIR = Path("data/audio_uploads")
+
+
+def _save_speech_record(request_id: str, transcript: str, answer: str, audio_filename: str | None = None) -> None:
+    RECORD_FILE.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "id": request_id,
+        "timestamp": datetime.now().isoformat(),
+        "transcript": transcript,
+        "answer": answer,
+        "audio_file": audio_filename,
+    }
+    with RECORD_FILE.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record) + "\n")
 
 
 # --- Dependencies (pull shared singletons off app.state, set in main.py's
@@ -176,9 +196,16 @@ async def voice_query(
     if not audio_bytes:
         raise HTTPException(status_code=400, detail="Empty audio upload.")
 
+    # Save raw audio recording to data/audio_uploads/
+    AUDIO_DIR.mkdir(parents=True, exist_ok=True)
+    audio_filename = f"{request_id}.wav"
+    audio_path = AUDIO_DIR / audio_filename
+    with audio_path.open("wb") as f:
+        f.write(audio_bytes)
+
     with tracker.stage("stt"):
         try:
-            transcription = transcribe_audio(audio_bytes, filename=audio.filename or "audio.webm")
+            transcription = transcribe_audio(audio_bytes, filename=audio.filename or audio_filename)
         except TranscriptionError as exc:
             logger.error(f'"[{request_id}] STT failed: {exc}"')
             raise HTTPException(status_code=422, detail=f"Could not transcribe audio: {exc}") from exc
@@ -186,6 +213,15 @@ async def voice_query(
     response = _run_pipeline(transcription.text, retriever, generator, settings, tracker)
     response.transcript = transcription.text
     tracker.finalize()
+
+    # Save record to data/speech_records.jsonl
+    _save_speech_record(
+        request_id=request_id,
+        transcript=transcription.text,
+        answer=response.answer,
+        audio_filename=audio_filename,
+    )
+
     return response
 
 
@@ -196,30 +232,49 @@ async def text_query(
     generator: AnswerGenerator = Depends(get_generator),
     settings: Settings = Depends(get_current_settings),
 ):
-    """Text-only variant of the pipeline (skips STT). Useful for automated
-    latency benchmarking (see scripts/benchmark_latency.py) and for testing
-    the retrieval/generation/guardrail stack independent of audio I/O."""
+    """Text-only variant of the pipeline (skips STT)."""
     request_id = str(uuid.uuid4())
     tracker = LatencyTracker(request_id=request_id)
     response = _run_pipeline(
         payload.query, retriever, generator, settings, tracker, top_k=payload.top_k
     )
     tracker.finalize()
+
+    _save_speech_record(
+        request_id=request_id,
+        transcript=payload.query,
+        answer=response.answer,
+    )
+
     return response
 
 
 @router.post("/transcribe", response_model=TranscriptionResponse)
 async def transcribe_only(audio: UploadFile = File(...)):
-    """STT-only endpoint, exposed separately for debugging the mic/STT leg
-    of the pipeline in isolation from retrieval/generation."""
+    """STT-only endpoint."""
     audio_bytes = await audio.read()
     if not audio_bytes:
         raise HTTPException(status_code=400, detail="Empty audio upload.")
     try:
-        result = transcribe_audio(audio_bytes, filename=audio.filename or "audio.webm")
+        result = transcribe_audio(audio_bytes, filename=audio.filename or "audio.wav")
     except TranscriptionError as exc:
         raise HTTPException(status_code=422, detail=f"Could not transcribe audio: {exc}") from exc
     return TranscriptionResponse(text=result.text, language=result.language, provider=result.provider)
+
+
+
+@router.get("/history")
+async def get_history(limit: int = 50):
+    """Returns past recorded speech queries and answers."""
+    if not RECORD_FILE.exists():
+        return {"records": []}
+    
+    records = []
+    with RECORD_FILE.open("r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                records.append(json.loads(line.strip()))
+    return {"records": records[-limit:]}
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -236,6 +291,6 @@ async def health(request: Request):
 
 @router.get("/metrics", response_model=MetricsResponse)
 async def metrics():
-    """P50 / P70 / P100 latency percentiles per pipeline stage, computed over
-    recent requests -- backs the latency-analytics submission requirement."""
+    """P50 / P70 / P100 latency percentiles per pipeline stage."""
     return compute_percentiles()
+

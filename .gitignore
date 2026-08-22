@@ -1,5 +1,7 @@
-<<<<<<< HEAD
+venv/
+voice_rag_db/
 .env
-=======
-.env
->>>>>>> f378c8232800d8587e9d4010da5f4602616be657
+__pycache__/
+*.mp3
+*.wav
+data/

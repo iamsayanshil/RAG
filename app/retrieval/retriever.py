@@ -52,10 +52,14 @@ class EmbeddingModel:
             self._model = SentenceTransformer(self.model_name)
         return self._model
 
-    def encode(self, texts: list[str], normalize: bool = True) -> np.ndarray:
+    def encode(self, texts: list[str], normalize: bool = True, batch_size: int = 64) -> np.ndarray:
         model = self._load()
         embeddings = model.encode(
-            texts, convert_to_numpy=True, normalize_embeddings=normalize, show_progress_bar=False
+            texts,
+            batch_size=batch_size,
+            convert_to_numpy=True,
+            normalize_embeddings=normalize,
+            show_progress_bar=False,
         )
         return embeddings.astype("float32")
 
