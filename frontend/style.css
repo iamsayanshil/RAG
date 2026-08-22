@@ -77,6 +77,8 @@ body::before {
     height: 100vh;
     z-index: 0; 
     pointer-events: none; 
+    /* color
+: #003c86; */
 }
 
 .mic-icon {
@@ -93,12 +95,14 @@ body::before {
     z-index: 1;
     --ripple-color: 207, 0, 104;
     height: 120px;
+    /* color:rgb(207, 0, 104); */
     width: 120px;
     background-color: rgba(var(--ripple-color),1);
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    /* animation: dynamic-ripple 1.5s infinite; */
     filter: drop-shadow(-2px 3px 0px rgb(0, 0, 0));
     cursor: pointer;
     transition: background-color 0.4s ease;
@@ -142,14 +146,17 @@ body::before {
     margin-top: 5vh;
     display: flex;
     flex-direction: column;
+    /* justify-content: center; */
     align-items: center;
     gap: 20px;
+    
 }
 
 .mic-container.listening {
     --ripple-color: 255, 230, 0;
     background-color: rgba(var(--ripple-color), 1); 
     animation: dynamic-ripple 1.5s infinite;
+    /* animation: slideUpFade 0.5s ease-out forwards; */
 }
 
 .mic-container.listening .default-mic {
@@ -184,6 +191,8 @@ header{
 }
 .text-box{
     position: absolute;
+    /* z-index: 1; */
+    /* background-color: #fee101; */
     width: 100%;
     height: 70vh;
     top: 20%;
@@ -228,29 +237,43 @@ header{
 @keyframes slideUpFade {
   0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px); /* Starts 20px lower */
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0); /* Slides into its normal position */
   }
 }
+
+/* @keyframes dynamic-ripple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--ripple-color), 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 40px rgba(var(--ripple-color), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--ripple-color), 0);
+    }
+} */
 
 @keyframes bounce-bars {
     0% { transform: scaleY(0.6); }
     100% { transform: scaleY(1); } 
 }
 
+/* --- THREE.JS BACKGROUND CANVAS --- */
 #three-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 0;
-    pointer-events: none;
+    z-index: 0; /* Floats above the tree (-1) but behind your UI */
+    pointer-events: none; /* Crucial: lets you click the mic through the canvas */
 }
 
+/* Ensure the header text and input stay above the particles */
 header, .text-box {
     position: relative;
     z-index: 10;

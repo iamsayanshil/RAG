@@ -3,3 +3,5 @@ voice_rag_db/
 .env
 __pycache__/
 *.mp3
+*.wav
+data/
