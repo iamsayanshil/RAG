@@ -1,5 +1,5 @@
 const recordBtn = document.getElementById("record-btn");
-
+/** @type {MediaStream | null} */
 let micStream = null;
 
 recordBtn.addEventListener("click", async function () {
@@ -20,8 +20,8 @@ recordBtn.addEventListener("click", async function () {
             console.error("Microphone permission denied:", error);
         }
 
-    } 
-    
+    }
+
     // Disable microphone
     else {
 
