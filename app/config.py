@@ -21,16 +21,14 @@ class Settings(BaseSettings):
 
     # --- Speech-to-text ---
     # SWAN's frontend just streams a raw audio blob to us; we pick ONE provider here.
-    STT_PROVIDER: Literal["elevenlabs", "sarvam"] = "elevenlabs"
-    ELEVENLABS_API_KEY: str = ""
-    ELEVENLABS_STT_MODEL: str = "scribe_v2"
+    STT_PROVIDER: Literal["sarvam"] = "sarvam"
     SARVAM_API_KEY: str = ""
-    SARVAM_STT_MODEL: str = "saarika:v2"
+    SARVAM_STT_MODEL: str = "saarika:v2.5"
     STT_LANGUAGE_CODE: str | None = None  # None => auto-detect
 
     # --- LLM (answer generation) ---
-    OPENAI_API_KEY: str = ".env"
-    LLM_MODEL: str = "gpt-5.6-luna"
+    OPENAI_API_KEY: str = ""
+    LLM_MODEL: str = "gpt-4o-mini"
     LLM_MAX_TOKENS: int = 4096
     LLM_TIMEOUT_S: int = 60
     LLM_MAX_RETRIES: int = 3
@@ -47,7 +45,7 @@ class Settings(BaseSettings):
     HYBRID_DENSE_WEIGHT: float = 0.6  # dense vs. BM25 fusion weight
 
     # --- Chunking (see app/retrieval/chunking.py for the strategies themselves) ---
-    CHUNK_STRATEGIES: list[str] = ["fixed", "sliding_window", "sentence_semantic", "metadata_aware"]
+    CHUNK_STRATEGIES: list[str] = ["fixed", "sliding_window"]
     FIXED_CHUNK_SIZE_TOKENS: int = 128
     FIXED_CHUNK_OVERLAP_TOKENS: int = 0
     SLIDING_CHUNK_SIZE_TOKENS: int = 96

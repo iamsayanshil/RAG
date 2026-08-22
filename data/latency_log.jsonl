@@ -1,0 +1,8 @@
+{"request_id": "ff340da5-4bb9-41a0-b0cc-ef81508f4a84", "stages_ms": {"stt": 4229.882, "guardrail_input": 0.123}, "total_ms": 4268.794, "ts": 1787409287.4843671}
+{"request_id": "31790663-4435-4c2e-8646-9a81c4108215", "stages_ms": {"stt": 4381.059, "guardrail_input": 0.178}, "total_ms": 4575.452, "ts": 1787409306.14755}
+{"request_id": "357d49db-ab23-4228-af68-50d4f0d801f5", "stages_ms": {"stt": 17891.67, "guardrail_input": 0.13}, "total_ms": 17929.266, "ts": 1787409751.5981512}
+{"request_id": "1110d657-250b-42fa-a36c-fd66d71f98f9", "stages_ms": {"stt": 7202.95, "guardrail_input": 0.374}, "total_ms": 10440.145, "ts": 1787410169.3719242}
+{"request_id": "b0e60861-e69b-49f2-a9ef-94d959254f41", "stages_ms": {"stt": 2564.429, "guardrail_input": 0.159}, "total_ms": 2607.026, "ts": 1787412711.487723}
+{"request_id": "39331336-df6d-4156-a6cd-49bf81178962", "stages_ms": {"stt": 7666.936, "guardrail_input": 3.393, "retrieval": 196.145, "rerank": 63189.556, "generation": 5774.855, "guardrail_grounding": 0.759}, "total_ms": 77625.418, "ts": 1787412905.279993}
+{"request_id": "fcc615d5-35c3-4903-8475-ce955e8c3c5a", "stages_ms": {"stt": 3316.221, "guardrail_input": 0.127, "retrieval": 38.515, "rerank": 10445.349, "generation": 7665.78, "guardrail_grounding": 141.741}, "total_ms": 21657.442, "ts": 1787413982.3242538}
+{"request_id": "84c96183-2d65-4051-a875-b50867c568eb", "stages_ms": {"stt": 6334.685, "guardrail_input": 1.671}, "total_ms": 7542.487, "ts": 1787419133.0452888}

@@ -97,9 +97,13 @@ class SarvamTranscriber(BaseTranscriber):
         if settings.STT_LANGUAGE_CODE:
             data["language_code"] = settings.STT_LANGUAGE_CODE
 
-        resp = requests.post(self.ENDPOINT, headers=headers, files=files, data=data, timeout=10)
-        resp.raise_for_status()
-        payload = resp.json()
+        try:
+            resp = requests.post(self.ENDPOINT, headers=headers, files=files, data=data, timeout=30)
+            resp.raise_for_status()
+            payload = resp.json()
+        except requests.exceptions.RequestException as req_err:
+            logger.error(f'"Sarvam STT network error: {req_err}"')
+            raise
 
         return TranscriptionResult(
             text=(payload.get("transcript") or "").strip(),
