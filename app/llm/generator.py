@@ -88,10 +88,10 @@ class AnswerGenerator:
 
     def _get_client(self):
         if self._client is None:
-            import anthropic
+            import openai
 
-            self._client = anthropic.Anthropic(
-                api_key=self.settings.ANTHROPIC_API_KEY,
+            self._client = openai.OpenAI(
+                api_key=self.settings.OPENAI_API_KEY,
                 timeout=self.settings.LLM_TIMEOUT_S,
             )
         return self._client

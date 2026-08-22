@@ -29,11 +29,11 @@ class Settings(BaseSettings):
     STT_LANGUAGE_CODE: str | None = None  # None => auto-detect
 
     # --- LLM (answer generation) ---
-    ANTHROPIC_API_KEY: str = ""
-    LLM_MODEL: str = "claude-sonnet-4-6"
-    LLM_MAX_TOKENS: int = 600
-    LLM_TIMEOUT_S: float = 15.0
-    LLM_MAX_RETRIES: int = 2
+    OPENAI_API_KEY: str = ".env"
+    LLM_MODEL: str = "gpt-5.6-luna"
+    LLM_MAX_TOKENS: int = 4096
+    LLM_TIMEOUT_S: int = 60
+    LLM_MAX_RETRIES: int = 3
 
     # --- Retrieval / vector DB ---
     DATASET_NAME: str = "ai4bharat/MSMARCO-XI"
